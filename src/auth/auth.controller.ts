@@ -13,6 +13,8 @@ import { RegistrationGuard } from './guards/registration.guard';
 import { LoginUserDto } from './dto/login-user.dto';
 import { LoginGuard } from './guards/login.guard';
 import { AuthService } from './auth.service';
+import { RefreshJWTGuard } from './guards/refresh-jwt.guard';
+import { RefreshTokenDto } from './dto/refresh-token.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -45,5 +47,38 @@ export class AuthController {
 
     res.statusCode = HttpStatus.CREATED;
     return res.send('user created');
+  }
+
+  @UseGuards(RefreshJWTGuard)
+  @Post('refresh')
+  async refreshToken(
+    @Body() refreshTokenDto: RefreshTokenDto,
+    @Res() res: Response,
+  ) {
+    const validToken = this.authService.verifyToken(
+      refreshTokenDto.refresh_token,
+    );
+    const user = await this.userService.findOne(refreshTokenDto.username);
+    const access = await this.authService.generateAccessToken(user);
+
+    if (validToken?.error) {
+      if (validToken?.error === 'jwt expired') {
+        const refresh = await this.authService.generateRefreshToken(
+          user._id as string,
+        );
+
+        res.statusCode = HttpStatus.OK;
+        return res.send({ ...access, ...refresh });
+      } else {
+        res.statusCode = HttpStatus.BAD_REQUEST;
+        return res.send({ error: validToken?.error });
+      }
+    } else {
+      res.statusCode = HttpStatus.OK;
+      return res.send({
+        ...access,
+        refresh_token: refreshTokenDto.refresh_token,
+      });
+    }
   }
 }

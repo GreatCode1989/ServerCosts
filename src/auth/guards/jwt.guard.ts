@@ -21,7 +21,7 @@ export class JWTGuard implements CanActivate {
     const token = request.headers.authorization.split(' ')[1];
 
     if (!token) {
-      throw new UnauthorizedException('Оштбка авторизации');
+      throw new UnauthorizedException('Ошибка авторизации');
     }
 
     const validToken = this.authService.verifyToken(token);

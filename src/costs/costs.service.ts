@@ -3,6 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Cost, CostDocument } from 'src/sсhemas/costs.schema';
 import { CreateCostsDto } from './dto/create-cost.dto';
+import { UpdateCostsDto } from './dto/update-cost.dto';
 
 @Injectable()
 export class CostsService {
@@ -21,7 +22,7 @@ export class CostsService {
     return createdCost.save();
   }
 
-  async update(updateCostDto: CreateCostsDto, id: string): Promise<Cost> {
+  async update(updateCostDto: UpdateCostsDto, id: string): Promise<Cost> {
     await this.costModel.updateOne(
       { _id: id },
       {

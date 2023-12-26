@@ -3,9 +3,12 @@ import { CostsService } from './costs.service';
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpCode,
   HttpStatus,
+  Param,
+  Patch,
   Post,
   Req,
   Res,
@@ -13,6 +16,7 @@ import {
 } from '@nestjs/common';
 import { JWTGuard } from 'src/auth/guards/jwt.guard';
 import { CreateCostsDto } from './dto/create-cost.dto';
+import { UpdateCostsDto } from './dto/update-cost.dto';
 
 @Controller('cost')
 export class CostsController {
@@ -46,5 +50,22 @@ export class CostsController {
       ...createCostsDto,
       userId: user._id as string,
     });
+  }
+
+  @UseGuards(JWTGuard)
+  @Patch(':id')
+  @HttpCode(HttpStatus.OK)
+  async updateCosts(
+    @Body() updateCostDto: UpdateCostsDto,
+    @Param('id') id: string,
+  ) {
+    return await this.costsService.update(updateCostDto, id);
+  }
+
+  @UseGuards(JWTGuard)
+  @Delete(':id')
+  @HttpCode(HttpStatus.OK)
+  async deleteCosts(@Param('id') id: string) {
+    return await this.costsService.delete(id);
   }
 }
