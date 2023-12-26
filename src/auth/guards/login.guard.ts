@@ -21,11 +21,11 @@ export class LoginGuard implements CanActivate {
     const user = await this.authService.validateUser(username);
 
     if (!user) {
-      throw new UnauthorizedException(`Пользователя ${username} не существует`);
+      throw new UnauthorizedException('Неверный логин или пароль');
     }
 
     if (user.password !== password) {
-      throw new UnauthorizedException(`Неправильный пароль`);
+      throw new UnauthorizedException(`Неверный логин или пароль`);
     }
 
     return true;
